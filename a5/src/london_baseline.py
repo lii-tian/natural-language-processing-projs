@@ -13,7 +13,7 @@ args = argp.parse_args()
 
 predictions = []
 
-for line in tqdm(open(args.eval_corpus_path, encoding='utf-8')):
+for line in tqdm(open(args.eval_corpus_path)):
         predictions.append('London')
 
 total, correct = utils.evaluate_places(args.eval_corpus_path, predictions)
