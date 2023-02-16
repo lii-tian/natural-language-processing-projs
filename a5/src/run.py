@@ -135,7 +135,7 @@ elif args.function == 'finetune':
   
     #finetune_text
     finetune_text = open(args.finetune_corpus_path, 'r').read() 
-    finetune_dataset = dataset.NameDataset(text, block_size) 
+    finetune_dataset = dataset.NameDataset(pretrain_dataset, finetune_text) 
     # initialize a trainer instance and kick off training
     tconf = trainer.TrainerConfig(max_epochs=2, batch_size=512, learning_rate=6e-4,
                             lr_decay=True, warmup_tokens=512*20, final_tokens=2*len(finetune_dataset)*block_size,
