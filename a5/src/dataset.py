@@ -168,7 +168,36 @@ class CharCorruptionDataset(Dataset):
 
     def __getitem__(self, idx):
         # TODO [part e]: see spec above
-        raise NotImplementedError
+        document = self.data[idx]       
+    
+        #1. Randomly truncate the document to a length no less than 4 characters,
+        #and no more than int(self.block_size*7/8) characters.
+        length = random.randint(4, int(self.block_size*7/8))    # randomly pick between [4, bloxksize*7/8]
+        truncated_doc = document[:length]                      #truncate the document
+
+        #2. Now, break the (truncated) document into three substrings:
+        # [prefix] [masked_content] [suffix]
+        truncated_doc_len = len(truncated_doc)
+        mask_len = int(random.uniform(1/4 - 1/8, 1/4 + 1/8) * truncated_doc_len)    #mean L/4, noise L/8
+        mask_start_idx = random.randint(1, truncated_doc_len - mask_len)            # start w/ 1 to ensure prefix is not empty
+
+        prefix = truncated_doc[:mask_start_idx]
+        masked_content = truncated_doc[mask_start_idx : mask_start_idx + mask_len - 1]
+        suffix = truncated_doc[mask_start_idx + mask_len - 1:]
+
+        #3. Rearrange these substrings into the following form:
+        #[prefix] MASK_CHAR [suffix] MASK_CHAR [masked_content] [pads]
+
+        #print(masked_string[:-1])
+        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content 
+        masked_string = masked_string + self.PAD_CHAR * (self.block_size - len(masked_string))
+
+        #construct x, y 
+        x = torch.tensor([self.stoi[c] for c in masked_string[:-1]], dtype=torch.long)       # x is up to the last word     
+        y = torch.tensor([self.stoi[c] for c in masked_string[1:]], dtype=torch.long)        # y shifted x by 1
+        
+        return x, y
+
 
 """
 Code under here is strictly for your debugging purposes; feel free to modify

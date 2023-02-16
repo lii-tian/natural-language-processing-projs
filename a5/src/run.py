@@ -93,7 +93,21 @@ if args.function == 'pretrain':
     # final_tokens=200*len(pretrain_dataset)*block_size
     # num_workers=4
     # writer=writer 
-    raise NotImplementedError
+    #raise NotImplementedError
+    # initialize a trainer instance and kick off training
+    tconf = trainer.TrainerConfig(max_epochs=650,
+                                    batch_size=128,
+                                    learning_rate=args.pretrain_lr,
+                                    lr_decay=True,
+                                    warmup_tokens=512*20,
+                                    final_tokens=200*len(pretrain_dataset)*block_size,
+                                    num_workers=4,
+                                    writer=writer)
+    train_mdl = trainer.Trainer(mdl, pretrain_dataset, None, tconf)
+    train_mdl.train()
+    #save model
+    torch.save(mdl.state_dict(), args.writing_params_path)
+
 elif args.function == 'finetune':
     assert args.writing_params_path is not None
     assert args.finetune_corpus_path is not None
@@ -132,19 +146,25 @@ elif args.function == 'finetune':
      
     #raise NotImplementedError
     #from mingpt.trainer import Trainer, TrainerConfig
-  
+
     #finetune_text
     finetune_text = open(args.finetune_corpus_path, 'r').read() 
     finetune_dataset = dataset.NameDataset(pretrain_dataset, finetune_text) 
+
+    #load model if pretrained weights exist 
+    if args.reading_params_path is None:
+        tconf = trainer.TrainerConfig(max_epochs=75,
+                                        batch_size=256,
+                                        learning_rate=args.finetune_lr,
+                                        lr_decay=True,
+                                        warmup_tokens=512*20,
+                                        final_tokens=200*len(pretrain_dataset)*block_size,
+                                        num_workers=4,
+                                        writer=writer)
+    else:
+        mdl.load_state_dict(torch.load(args.reading_params_path))
+
     # initialize a trainer instance and kick off training
-    tconf = trainer.TrainerConfig(max_epochs=75,
-                                    batch_size=256,
-                                    learning_rate=args.finetune_lr,
-                                    lr_decay=True,
-                                    warmup_tokens=512*20,
-                                    final_tokens=200*len(pretrain_dataset)*block_size,
-                                    num_workers=4,
-                                    writer=writer)
     train_mdl = trainer.Trainer(mdl, finetune_dataset, None, tconf)
     train_mdl.train()
     #save model
