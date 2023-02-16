@@ -183,7 +183,7 @@ class CharCorruptionDataset(Dataset):
         #2. Now, break the (truncated) document into three substrings:
         # [prefix] [masked_content] [suffix]
         mask_len = int(random.uniform(1/4 - 1/8, 1/4 + 1/8) * length)    #mean L/4, noise L/8
-        mask_start_idx = random.randint(1, length - mask_len)            # start w/ 1 to ensure prefix is not empty
+        mask_start_idx = random.randint(1, length - mask_len + 1)            # start w/ 1 to ensure prefix is not empty
 
         prefix = truncated_doc[:mask_start_idx]
         masked_content = truncated_doc[mask_start_idx : mask_start_idx + mask_len - 1]
