@@ -103,6 +103,7 @@ if args.function == 'pretrain':
                                     final_tokens=200*len(pretrain_dataset)*block_size,
                                     num_workers=4,
                                     writer=writer)
+    mdl = mdl.to(device)
     train_mdl = trainer.Trainer(mdl, pretrain_dataset, None, tconf)
     train_mdl.train()
     #save model
@@ -163,7 +164,6 @@ elif args.function == 'finetune':
                                         writer=writer)
     else:
         mdl.load_state_dict(torch.load(args.reading_params_path))
-        mdl = mdl.to(device)
         tconf = trainer.TrainerConfig(max_epochs=10,
                                         batch_size=256,
                                         learning_rate=args.finetune_lr,
@@ -174,6 +174,7 @@ elif args.function == 'finetune':
                                         writer=writer)
 
     # initialize a trainer instance and kick off training
+    mdl = mdl.to(device)
     train_mdl = trainer.Trainer(mdl, finetune_dataset, None, tconf)
     train_mdl.train()
     #save model
