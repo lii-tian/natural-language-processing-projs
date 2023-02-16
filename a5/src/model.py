@@ -90,9 +90,11 @@ class DownProjectBlock(nn.Module):
         super().__init__()
         ### YOUR CODE HERE
         ### Hint: Copy over the code from Block and make necessary modifications.
+        self.C = torch.empty(1, config.bottleneck_dim, config.n_embd).cuda()
+        nn.init.xavier_uniform_(self.C)
+
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.C = nn.init.xavier_uniform_(torch.empty(1, config.bottleneck_dim, config.n_embed), gain=1.0)
         self.crossattn = attention.CausalCrossAttention(config)
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
@@ -109,7 +111,9 @@ class DownProjectBlock(nn.Module):
         ### YOUR CODE HERE
         ### Hint: Copy over the code from Block and make necessary modifications.
         ### Should be around 3-5 lines.
+        print(self.C.is_cuda , x_input.is_cuda)
         x = self.C + self.crossattn(self.ln1(x_input), self.ln1(self.C))
+        print (x)
         x = self.mlp(self.ln2(x))
         ### END YOUR CODE
     

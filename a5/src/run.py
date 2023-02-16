@@ -69,6 +69,9 @@ if args.variant == 'vanilla':
 elif args.variant == 'perceiver':
     # set mconf.perceiver, and mconf.bottleneck_dim parameters appropriately.
     pass # [part g] Make some other model here
+    mconf.perceiver = True
+    mconf.bottleneck_dim = args.bottleneck_dim
+    mdl = model.GPT(mconf)
 else:
     raise ValueError("Unknown model variant")
 
@@ -185,6 +188,7 @@ elif args.function == 'evaluate':
     assert args.reading_params_path is not None
     assert args.eval_corpus_path is not None
     mdl.load_state_dict(torch.load(args.reading_params_path))
+    mdl = mdl.to(device)
     correct = 0
     total = 0
     with open(args.outputs_path, 'w', encoding='utf-8') as fout:
