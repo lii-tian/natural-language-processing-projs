@@ -163,6 +163,15 @@ elif args.function == 'finetune':
                                         writer=writer)
     else:
         mdl.load_state_dict(torch.load(args.reading_params_path))
+        mdl = mdl.to(device)
+        tconf = trainer.TrainerConfig(max_epochs=10,
+                                        batch_size=256,
+                                        learning_rate=args.finetune_lr,
+                                        lr_decay=True,
+                                        warmup_tokens=512*20,
+                                        final_tokens=200*len(pretrain_dataset)*block_size,
+                                        num_workers=4,
+                                        writer=writer)
 
     # initialize a trainer instance and kick off training
     train_mdl = trainer.Trainer(mdl, finetune_dataset, None, tconf)
