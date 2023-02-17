@@ -113,7 +113,7 @@ class DownProjectBlock(nn.Module):
         ### Should be around 3-5 lines.
         #print(self.C.is_cuda , x_input.is_cuda)
         x = self.C + self.crossattn(x_input, self.ln1(self.C))  
-        x = self.mlp(self.ln3(x))
+        x = self.mlp(self.ln2(x))
 
         return x
 
