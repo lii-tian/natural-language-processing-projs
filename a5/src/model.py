@@ -153,7 +153,7 @@ class UpProjectBlock(nn.Module):
         ### Hint: Copy over the code from Block and make necessary modifications.
         ### Should be around 3-5 lines.
         x = x_input + self.crossattn(self.ln1(y), self.ln2(x_input))
-        x = self.mlp(self.ln3(x))
+        x = x + self.mlp(self.ln3(x))
 
         return x
         ### END YOUR CODE
