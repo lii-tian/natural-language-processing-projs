@@ -95,7 +95,6 @@ class DownProjectBlock(nn.Module):
 
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.ln3 = nn.LayerNorm(config.n_embd)
         self.crossattn = attention.CausalCrossAttention(config)
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
@@ -113,7 +112,7 @@ class DownProjectBlock(nn.Module):
         ### Hint: Copy over the code from Block and make necessary modifications.
         ### Should be around 3-5 lines.
         #print(self.C.is_cuda , x_input.is_cuda)
-        x = self.C + self.crossattn(self.ln1(x_input), self.ln2(self.C))
+        x = self.C + self.crossattn(x_input, self.ln1(self.C))  
         x = self.mlp(self.ln3(x))
 
         return x
@@ -134,7 +133,6 @@ class UpProjectBlock(nn.Module):
         ### Hint: Copy over the code from Block and make necessary modifications.
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.ln3 = nn.LayerNorm(config.n_embd)
         self.crossattn = attention.CausalCrossAttention(config)
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
@@ -152,8 +150,8 @@ class UpProjectBlock(nn.Module):
         ### YOUR CODE HERE
         ### Hint: Copy over the code from Block and make necessary modifications.
         ### Should be around 3-5 lines.
-        x = x_input + self.crossattn(self.ln1(y), self.ln2(x_input))
-        x = x + self.mlp(self.ln3(x))
+        x = x_input + self.crossattn(self.ln1(y), x_input)
+        x = x + self.mlp(self.ln2(x))
 
         return x
         ### END YOUR CODE
