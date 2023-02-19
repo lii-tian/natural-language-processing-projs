@@ -90,7 +90,7 @@ class DownProjectBlock(nn.Module):
         super().__init__()
         ### YOUR CODE HERE
         ### Hint: Copy over the code from Block and make necessary modifications.
-        self.C = torch.empty(1, config.bottleneck_dim, config.n_embd).cuda()
+        self.C = nn.Parameter(torch.empty(1, config.bottleneck_dim, config.n_embd))
         nn.init.xavier_uniform_(self.C)
 
         self.ln1 = nn.LayerNorm(config.n_embd)
